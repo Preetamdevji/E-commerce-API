@@ -1,0 +1,304 @@
+swagger: "2.0"
+info:
+  title: E-commerce API
+  description: This is the API documentation for the E-commerce API.
+    The API provides endpoints for managing user-related operations, authentication, authorization, and job-related operations.
+    Users can register, retrieve all users, update user information, delete users, login, get authenticated user details, create, update, delete, and retrieve all products.
+  version: 1.0
+  contact:
+    email: preetam.devji123@gmail.com
+  liscence:
+    name: Apache 2.0
+    url: "http://www.apache.org/liscences/LIS"
+  servers:
+    -url: http://localhost:5000/
+    description: THis is my local Server
+    -url: http://example.com/
+    description: This is my original URL
+schemes: [http,https]
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Endpoint to register a new user.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: User object for registration
+          required: true
+          schema:
+            type: object
+            properties:
+              userName:
+                type: string
+                description: User's username
+              email:
+                type: string
+                format: email
+                description: User's email address
+              password:
+                type: string
+                description: User's password
+      responses:
+        200:
+          description: Successful registration
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                description: User data excluding password
+              auth:
+                type: string
+                description: JWT token for authentication
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              result:
+                type: string
+                description: Error message
+        404:
+          description: Not Found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Error message
+
+  /login:
+    post:
+      summary: User login
+      description: Endpoint for user authentication and login.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: userCredentials
+          description: User credentials for login
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: User's email address
+              password:
+                type: string
+                description: User's password
+      responses:
+        200:
+          description: Successful login
+          schema:
+            type: object
+            properties:
+              userResult:
+                type: object
+                description: User data excluding password
+              auth:
+                type: string
+                description: JWT token for authentication
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              result:
+                type: string
+                description: Error message
+        401:
+          description: Unauthorized
+          schema:
+            type: string
+            description: Error message
+        404:
+          description: Not Found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Error message
+
+  /addProduct:
+    post:
+      summary: Add a new product
+      parameters:
+        - name: body
+          in: body
+          description: Product details
+          required: true
+          schema:
+            type: object
+            properties:
+              productName:
+                type: string
+                description: Name of the product
+              productPrice:
+                type: string
+                description: Price of the product
+              productCategory:
+                type: string
+                description: Category of the product
+              userId:
+                type: string
+                description: User ID associated with the product
+              company:
+                type: string
+                description: Company name associated with the product
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+                description: ID of the created product
+              productName:
+                type: string
+                description: Name of the products
+              productPrice:
+                type: string
+                description: Price of the products
+              productCategory:
+                type: string
+                description: Category of the products
+              userId:
+                type: string
+                description: User ID associated with the products
+              company:
+                type: string
+                description: Company name associated with the products
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+  /products:
+    get:
+      summary: Get all products
+      description: Retrieve a list of all products.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Successful operation
+        404:
+          description: No products found
+         
+  /delete/{id}:
+    delete:
+      summary: Delete a product by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the product to be deleted
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted the product
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+  /update/{id}:
+    get:
+      summary: Get product details by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the product to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved product details
+          content:
+            application/json:
+              example:
+                _id: "example_id"
+                name: "example_product"
+                description: "example_description"
+                price: 19.99
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              example:
+                Result: "No Result Found"
+        '500':
+          description: Internal server error
+
+  /updateProduct/{id}:
+    put:
+      summary: Update product details by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the product to be updated
+          schema:
+            type: string
+        - in: body
+          name: product
+          required: true
+          description: The updated product details
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              price:
+                type: number
+      responses:
+        '200':
+          description: Successfully updated the product
+        '404':
+          description: Product not found
+
+  /search/{key}:
+    get:
+      summary: Search products by key
+      parameters:
+        - in: path
+          name: key
+          required: true
+          description: The search key to find products
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved search results
+          content:
+            application/json:
+              example:
+                - _id: "example_id_1"
+                  productName: "example_product_1"
+                  productCategory: "example_category_1"
+                  company: "example_company_1"
+                - _id: "example_id_2"
+                  productName: "example_product_2"
+                  productCategory: "example_category_2"
+                  company: "example_company_2"
+                # Additional products as needed
+        '500':
+          description: Internal server error
+
+
