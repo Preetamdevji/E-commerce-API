@@ -1,18 +1,18 @@
 const express = require('express');
-require('./config');
 const users = require("./model/users");
-const products = require("./model/products");
-const  cors = require('cors');
+// const products = require("./model/products");
+require('../backend/work/connectionCode')
+const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(cors());
 const Jwt = require('jsonwebtoken');
-const {JwtKey} = require('./config/keys')
+const { JwtKey } = require('./config/keys');
 const YAML = require("yamljs");
 const swaggerJSDocs = YAML.load("./api.yaml");
 const swaggerUI = require("swagger-ui-express");
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
-const PORT = 8080;
+
 
 
 app.post('/register', async(req,resp)=>{
@@ -22,9 +22,9 @@ app.post('/register', async(req,resp)=>{
         let data = await user.save();
         data = data.toObject();
         delete data.password;
-        Jwt.sign({data},JwtKey,{expiresIn:'6h'},(err,token)=>{
+        Jwt.sign({data},JwtKey,{expiresIn:'18000000'},(err,token)=>{
             if(err){
-                resp.send({result : "Something Wrong Please Try Again In 1 hour"})
+                resp.send({result : "Something Wrong Please Try Again In 5 hour"})
             }else{
                 resp.send({data , auth : token});
             }
@@ -36,13 +36,12 @@ app.post('/register', async(req,resp)=>{
 });
 
 
-
 app.post('/login', async (req,resp)=>{
     // console.log(req.body);
     if (req.body.email && req.body.password){
     const userResult = await users.findOne(req.body).select("-password");    
     if(userResult){
-        Jwt.sign({userResult},JwtKey,{expiresIn : "6h"},(err,token)=>{
+        Jwt.sign({userResult},JwtKey,{expiresIn : "18000000"},(err,token)=>{
             if(err){
                 resp.send({result: "try again"});
             }else{
@@ -133,4 +132,4 @@ if(process.env.NODE_ENV=='production'){
 }
 
 
-app.listen(8080);
+
